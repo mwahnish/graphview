@@ -48,9 +48,10 @@ class GraphView extends StatefulWidget {
   final void Function(Edge)? onEdgeTap;
   final void Function(Edge)? onEdgeHoverStart;
   final void Function(Edge)? onEdgeHoverEnd;
+  final void Function()? onBackgroundTap;
 
   GraphView(
-      {Key? key, required this.graph, required this.algorithm, this.paint, required this.builder,this.onEdgeTap, this.onEdgeHoverStart, this.onEdgeHoverEnd, this.animated = true})
+      {Key? key, required this.graph, required this.algorithm, this.paint, required this.builder,this.onEdgeTap, this.onEdgeHoverStart, this.onEdgeHoverEnd, this.onBackgroundTap, this.animated = true})
       : super(key: key);
 
   @override
@@ -104,6 +105,8 @@ class _GraphViewState extends State<GraphView> {
                 var hitTestResult = widget.algorithm.hitTestEdges(graph: widget.graph, position: details.localPosition);
                 if (hitTestResult != null) {
                   widget.onEdgeTap?.call(hitTestResult);
+                }else{
+                  widget.onBackgroundTap?.call();
                 }
               },
               child: Container(
