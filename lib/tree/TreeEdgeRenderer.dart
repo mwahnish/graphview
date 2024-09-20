@@ -64,4 +64,62 @@ class TreeEdgeRenderer extends EdgeRenderer {
       });
     });
   }
+  
+  @override
+  Edge? hitTestEdges({required Graph graph, required Offset position}) {
+    var levelSeparationHalf = configuration.levelSeparation / 2;
+
+    for (var node in graph.nodes){
+      var children = graph.successorsOf(node);
+
+      for (var child in children){
+        var edge = graph.getEdgeBetween(node, child);
+        
+        switch (configuration.orientation) {
+          case BuchheimWalkerConfiguration.ORIENTATION_TOP_BOTTOM:
+            var p1 = Offset(child.x + child.width / 2, child.y);
+            var p2 = Offset(child.x + child.width / 2, child.y - levelSeparationHalf);
+            var p3 = Offset(node.x + node.width / 2, child.y - levelSeparationHalf);
+            var p4 = Offset(node.x + node.width / 2, node.y + node.height);
+            if (hitTestEdge(p1: p1, p2: p2, position: position) || hitTestEdge(p1: p2, p2: p3, position: position) || hitTestEdge(p1: p3, p2: p4, position: position)) {
+              return edge;
+            }
+
+            break;
+          case BuchheimWalkerConfiguration.ORIENTATION_BOTTOM_TOP:
+            var p1 = Offset(child.x + child.width / 2, child.y + child.height);
+            var p2 = Offset(child.x + child.width / 2, child.y + child.height + levelSeparationHalf);
+            var p3 = Offset(node.x + node.width / 2, child.y + child.height + levelSeparationHalf);
+            var p4 = Offset(node.x + node.width / 2, node.y + node.height);
+
+            if (hitTestEdge(p1: p1, p2: p2, position: position) || hitTestEdge(p1: p2, p2: p3, position: position) || hitTestEdge(p1: p3, p2: p4, position: position)) {
+              return edge;
+            }
+
+            break;
+          case BuchheimWalkerConfiguration.ORIENTATION_LEFT_RIGHT:
+            var p1 = Offset(child.x, child.y + child.height / 2);
+            var p2 = Offset(child.x - levelSeparationHalf, child.y + child.height / 2);
+            var p3 = Offset(child.x - levelSeparationHalf, node.y + node.height / 2);
+            var p4 = Offset(node.x + node.width, node.y + node.height / 2);
+
+            if (hitTestEdge(p1: p1, p2: p2, position: position) || hitTestEdge(p1: p2, p2: p3, position: position) || hitTestEdge(p1: p3, p2: p4, position: position)) {
+              return edge;
+            }
+
+            break;
+          case BuchheimWalkerConfiguration.ORIENTATION_RIGHT_LEFT:
+            var p1 = Offset(child.x + child.width, child.y + child.height / 2);
+            var p2 = Offset(child.x + child.width + levelSeparationHalf, child.y + child.height / 2);
+            var p3 = Offset(child.x + child.width + levelSeparationHalf, node.y + node.height / 2);
+            var p4 = Offset(node.x + node.width, node.y + node.height / 2);
+
+            if (hitTestEdge(p1: p1, p2: p2, position: position) || hitTestEdge(p1: p2, p2: p3, position: position) || hitTestEdge(p1: p3, p2: p4, position: position)) {
+              return edge;
+            }
+        }
+
+      }
+    }
+  }
 }

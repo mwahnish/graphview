@@ -286,6 +286,11 @@ class FruchtermanReingoldAlgorithm implements Algorithm {
     graphWidth = width;
     graphHeight = height;
   }
+
+  @override
+  Edge? hitTestEdges({required Graph graph, required Offset position}) {
+    return renderer!.hitTestEdges(graph: graph, position: position);
+  }
 }
 
 class NodeCluster {
@@ -343,4 +348,6 @@ class NodeCluster {
     nodes = [];
     rect = Rect.zero;
   }
+
+  
 }

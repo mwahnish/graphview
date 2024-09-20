@@ -45,9 +45,10 @@ class GraphView extends StatefulWidget {
   final Paint? paint;
   final NodeWidgetBuilder builder;
   final bool animated;
+  final void Function(Edge)? onEdgeTap;
 
   GraphView(
-      {Key? key, required this.graph, required this.algorithm, this.paint, required this.builder, this.animated = true})
+      {Key? key, required this.graph, required this.algorithm, this.paint, required this.builder,this.onEdgeTap, this.animated = true})
       : super(key: key);
 
   @override
@@ -66,12 +67,20 @@ class _GraphViewState extends State<GraphView> {
         builder: widget.builder,
       );
     } else {
-      return _GraphView(
-        key: widget.key,
-        graph: widget.graph,
-        algorithm: widget.algorithm,
-        paint: widget.paint,
-        builder: widget.builder,
+      return GestureDetector(
+        onTapDown: (details) {
+          var hitTestResult = widget.algorithm.hitTestEdges(graph: widget.graph, position: details.localPosition);
+          if (hitTestResult != null) {
+            widget.onEdgeTap?.call(hitTestResult);
+          }
+        },
+        child: _GraphView(
+          key: widget.key,
+          graph: widget.graph,
+          algorithm: widget.algorithm,
+          paint: widget.paint,
+          builder: widget.builder,
+        ),
       );
     }
   }
@@ -221,6 +230,7 @@ class RenderCustomLayoutBox extends RenderBox
 
   @override
   bool hitTestChildren(BoxHitTestResult result, {required Offset position}) {
+    
     return defaultHitTestChildren(result, position: position);
   }
 

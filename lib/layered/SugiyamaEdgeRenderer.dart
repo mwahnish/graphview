@@ -152,4 +152,62 @@ class SugiyamaEdgeRenderer extends ArrowEdgeRenderer {
       }
     }
   }
+  
+  @override
+  Edge? hitTestEdges({required Graph graph, required Offset position}) {
+    
+
+    for(var edge in graph.edges) {
+      final source = edge.source;
+
+      var x = source.x;
+      var y = source.y;
+
+      var destination = edge.destination;
+
+      var x1 = destination.x;
+      var y1 = destination.y;
+
+      var clippedLine = <double>[];
+
+      if (edgeData.containsKey(edge) && edgeData[edge]!.bendPoints.isNotEmpty) {
+        // draw bend points
+        var bendPoints = edgeData[edge]!.bendPoints;
+        final size = bendPoints.length;
+
+        if (nodeData[source]!.isReversed) {
+          clippedLine = clipLine(bendPoints[2], bendPoints[3], bendPoints[0], bendPoints[1], destination);
+        } else {
+          clippedLine = clipLine(
+              bendPoints[size - 4], bendPoints[size - 3], bendPoints[size - 2], bendPoints[size - 1], destination);
+        }
+
+
+        for (var i = 0; i < bendPoints.length; i += 2) {
+          final isLastPoint = i == bendPoints.length - 2;
+
+          final x = bendPoints[i];
+          final y = bendPoints[i + 1];
+          final x2 = isLastPoint ? -1 : bendPoints[i + 2];
+          final y2 = isLastPoint ? -1 : bendPoints[i + 3];
+          
+          if (hitTestEdge(p1: Offset(x, y), p2: Offset(x2 as double, y2 as double), position: position)){
+            return edge;
+          }
+        }
+
+      } else {
+        final startX = x + source.width / 2;
+        final startY = y + source.height / 2;
+        final stopX = x1 + destination.width / 2;
+        final stopY = y1 + destination.height / 2;
+
+        clippedLine = clipLine(startX, startY, stopX, stopY, destination);
+
+         if (hitTestEdge(p1: Offset(clippedLine[0], clippedLine[1]), p2: Offset(stopX, stopY), position: position)){
+            return edge;
+          }
+      }
+    }
+  }
 }

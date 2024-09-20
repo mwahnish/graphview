@@ -1003,4 +1003,9 @@ class SugiyamaAlgorithm extends Algorithm {
     // graphWidth = width;
     // graphHeight = height;
   }
+  
+  @override
+  Edge? hitTestEdges({required Graph graph, required Offset position}) {
+    return renderer!.hitTestEdges(graph: graph, position: position);
+  }
 }

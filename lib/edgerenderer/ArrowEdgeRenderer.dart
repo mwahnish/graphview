@@ -107,4 +107,33 @@ class ArrowEdgeRenderer extends EdgeRenderer {
 
     return resultLine;
   }
+  
+  @override
+  Edge? hitTestEdges({required Graph graph, required Offset position}) {
+    
+
+    for(var edge in graph.edges) {
+      var source = edge.source;
+      var destination = edge.destination;
+
+      var sourceOffset = source.position;
+
+      var x1 = sourceOffset.dx;
+      var y1 = sourceOffset.dy;
+
+      var destinationOffset = destination.position;
+
+      var x2 = destinationOffset.dx;
+      var y2 = destinationOffset.dy;
+
+      var startX = x1 + source.width / 2;
+      var startY = y1 + source.height / 2;
+      var stopX = x2 + destination.width / 2;
+      var stopY = y2 + destination.height / 2;
+
+      if (hitTestEdge(p1: Offset(startX, startY), p2: Offset(stopX, stopY), position: position)){
+        return edge;
+      }
+    }
+  }
 }
