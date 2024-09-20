@@ -46,9 +46,11 @@ class GraphView extends StatefulWidget {
   final NodeWidgetBuilder builder;
   final bool animated;
   final void Function(Edge)? onEdgeTap;
+  final void Function(Edge)? onEdgeHoverStart;
+  final void Function(Edge)? onEdgeHoverEnd;
 
   GraphView(
-      {Key? key, required this.graph, required this.algorithm, this.paint, required this.builder,this.onEdgeTap, this.animated = true})
+      {Key? key, required this.graph, required this.algorithm, this.paint, required this.builder,this.onEdgeTap, this.onEdgeHoverStart, this.onEdgeHoverEnd, this.animated = true})
       : super(key: key);
 
   @override
@@ -56,6 +58,9 @@ class GraphView extends StatefulWidget {
 }
 
 class _GraphViewState extends State<GraphView> {
+
+  Edge? _hoveredEdge;
+
   @override
   Widget build(BuildContext context) {
     if (widget.algorithm is FruchtermanReingoldAlgorithm) {
@@ -69,6 +74,44 @@ class _GraphViewState extends State<GraphView> {
     } else {
       return Stack(
         children: [
+          
+          Positioned.fill(
+            child: MouseRegion(
+              onHover: (event) {
+                var hitTestResult = widget.algorithm.hitTestEdges(graph: widget.graph, position: event.localPosition);
+                if (hitTestResult != _hoveredEdge) {
+
+                  // ending previous hover if necessary
+                  if (_hoveredEdge != null) {
+                    widget.onEdgeHoverEnd?.call(_hoveredEdge!);
+                  }
+
+                  // starting new hover if necessary
+                  if (hitTestResult != null) {
+                    widget.onEdgeHoverStart?.call(hitTestResult);
+                  }
+                }
+                _hoveredEdge = hitTestResult; 
+              },
+              onExit: (event) {
+                if (_hoveredEdge != null) {
+                  widget.onEdgeHoverEnd?.call(_hoveredEdge!);
+                }
+                _hoveredEdge = null;
+              },
+              child: GestureDetector(
+              onTapDown: (details) {
+                var hitTestResult = widget.algorithm.hitTestEdges(graph: widget.graph, position: details.localPosition);
+                if (hitTestResult != null) {
+                  widget.onEdgeTap?.call(hitTestResult);
+                }
+              },
+              child: Container(
+                color: Theme.of(context).colorScheme.surface,
+              ),
+                        ),
+            ),
+          ),
           _GraphView(
             key: widget.key,
             graph: widget.graph,
@@ -76,17 +119,8 @@ class _GraphViewState extends State<GraphView> {
             paint: widget.paint,
             builder: widget.builder,
           ),
-          GestureDetector(
-            onTapDown: (details) {
-              var hitTestResult = widget.algorithm.hitTestEdges(graph: widget.graph, position: details.localPosition);
-              if (hitTestResult != null) {
-                widget.onEdgeTap?.call(hitTestResult);
-              }
-            },
-            child: Container(
-              color: Colors.red,
-            ),
-          ),
+        
+          
         ],
       );
     }
