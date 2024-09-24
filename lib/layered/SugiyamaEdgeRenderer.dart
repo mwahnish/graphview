@@ -191,7 +191,7 @@ class SugiyamaEdgeRenderer extends ArrowEdgeRenderer {
           final x2 = isLastPoint ? -1 : bendPoints[i + 2];
           final y2 = isLastPoint ? -1 : bendPoints[i + 3];
           
-          if (hitTestEdge(p1: Offset(x, y), p2: Offset(x2 as double, y2 as double), position: position)){
+          if (hitTestEdge(p1: Offset(x, y), p2: Offset(x2.toDouble(), y2.toDouble()), position: position)){
             return edge;
           }
         }
